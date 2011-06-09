@@ -1,0 +1,49 @@
+proc setup {} {
+    save_env
+}
+
+
+proc teardown {} {
+    assert_env_unmodified
+}
+
+
+setup
+
+
+assert_complete_any "nice "
+
+
+sync_after_int
+
+
+set test "--<TAB> should complete all long options"
+set options [list --adjustment= --help --version]
+assert_complete $options "nice --" $test
+
+
+sync_after_int
+
+
+set test "-n should complete niceness"
+assert_complete "-2 -20" "nice -n -2" $test
+
+
+sync_after_int
+
+
+set test "--adjustment 7 ls --<TAB> should complete ls options"
+assert_complete "--human-readable" "nice --adjustment 7 ls --hum" $test
+
+
+sync_after_int
+
+
+set test "--adjustment=7 ls --<TAB> should complete ls options"
+assert_complete "--human-readable" "nice --adjustment=7 ls --hum" $test
+
+
+sync_after_int
+
+
+teardown

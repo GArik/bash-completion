@@ -134,6 +134,47 @@ _mktemp()
 } &&
 complete -F _mktemp mktemp
 
+# nice(1) completion
+#
+have nice &&
+_nice()
+{
+    local offset i
+    offset=0
+    for (( i=1; i <= COMP_CWORD; i++ )); do
+        if [[ "${COMP_WORDS[i]}" == -@(n|-adjustment) ]]; then
+            ((i++))
+            [[ $i -lt $COMP_CWORD && ${COMP_WORDS[i]} == '=' ]] && ((i++))
+        elif [[ "${COMP_WORDS[i]}" != -* ]]; then
+            offset=$i
+            break
+        fi
+    done
+
+    if [[ $offset -gt 0 && $offset -lt $COMP_CWORD ]]; then
+        _command_offset $offset
+        return
+    fi
+
+    local cur prev words cword split
+    _init_completion -s || return
+
+    if [[ "$prev" == -@(n|-adjustment) ]]; then
+        COMPREPLY=( $( compgen -W '{-20..19}' -- "$cur" ) )
+        return 0
+    fi
+
+    $split && return 0
+
+    if [[ "$cur" == -* ]]; then
+        COMPREPLY=( $( compgen -W '$( _parse_help "$1" --help )' -- "$cur" ) )
+        [[ $COMPREPLY == *= ]] && compopt -o nospace
+        return 0
+    fi
+
+    _filedir
+} && complete -F _nice nice
+
 # Local variables:
 # mode: shell-script
 # sh-basic-offset: 4
