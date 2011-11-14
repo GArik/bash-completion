@@ -483,6 +483,7 @@ CLEANFILES = \
 	tracepath6 \
 	typeset \
 	umount \
+	valgrind \
 	vgcfgbackup \
 	vgcfgrestore \
 	vgchange \
