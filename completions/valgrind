@@ -90,7 +90,7 @@ fi
             return
             ;;
         --log-socket|--xml-socket)
-            # expect ipaddr:port
+            # expect ipaddr:port (host names are not supported)
             # FIXME
             return
             ;;
@@ -154,7 +154,7 @@ fi
             return
             ;;
         --trace-addr)
-            # FIXME: wtf is address?
+            # argument required but no completions available
             return
             ;;
         ## Helgrind options ##
@@ -235,7 +235,16 @@ fi
             ;;
         --malloc-fill|--free-fill)
             # expect hex number
-            # FIXME
+            if [[ $cur == 0x* ]]; then
+                if [[ $cur == 0x??* ]]; then # 0xff is a maximum
+                    COMPREPLY=( "$cur" )
+                else
+                    COMPREPLY=( $(compgen -W "{0..9} {a..f}") )
+                    compopt -o nospace
+                fi
+            else
+                COMPREPLY=( $(compgen -W "{0..255}" -- "$cur") )
+            fi
             return
             ;;
         --ignore-ranges)
