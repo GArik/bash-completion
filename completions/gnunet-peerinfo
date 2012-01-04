@@ -1,0 +1,29 @@
+# gnunet-peerinfo(1) completion                            -*- shell-script -*-
+
+_gnunet_peerinfo()
+{
+    local cur prev words cword split
+    _init_completion -s || return
+
+    case $prev in
+        -c|--config|-l|--logfile)
+            _filedir
+            return
+            ;;
+        -L|--log)
+            COMPREPLY=( $( compgen -W 'DEBUG INFO WARNING ERROR' -- "$cur" ) )
+            return
+            ;;
+    esac
+
+    $split && return
+
+    if [[ "$cur" == -* ]]; then
+        COMPREPLY=( $( compgen -W '$( _parse_help "$1" --help )' -- "$cur" ) )
+        [[ $COMPREPLY == *= ]] && compopt -o nospace
+        return
+    fi
+} &&
+complete -F _gnunet_peerinfo gnunet-peerinfo
+
+# ex: ts=4 sw=4 et filetype=sh

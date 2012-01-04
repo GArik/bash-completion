@@ -1,0 +1,39 @@
+# gnunet-search(1) completion                              -*- shell-script -*-
+
+_gnunet_search()
+{
+    local cur prev words cword split
+    _init_completion -s || return
+
+    case $prev in
+        -c|--config|-o|--output|-l|--logfile)
+            _filedir
+            return
+            ;;
+        -L|--log)
+            COMPREPLY=( $( compgen -W 'DEBUG INFO WARNING ERROR' -- "$cur" ) )
+            return
+            ;;
+        -a|--anonymity)
+            COMPREPLY=( $( compgen -W '{0..9}' -- "$cur" ) )
+            return
+            ;;
+        -t|--timeout|-N|--results)
+            # expect integer value
+            COMPREPLY+=( $( compgen -W '{0..9}' ) )
+            compopt -o nospace
+            return
+            ;;
+    esac
+
+    $split && return
+
+    if [[ "$cur" == -* ]]; then
+        COMPREPLY=( $( compgen -W '$( _parse_help "$1" --help )' -- "$cur" ) )
+        [[ $COMPREPLY == *= ]] && compopt -o nospace
+        return
+    fi
+} &&
+complete -F _gnunet_search gnunet-search
+
+# ex: ts=4 sw=4 et filetype=sh

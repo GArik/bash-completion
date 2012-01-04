@@ -1,0 +1,38 @@
+# gnunet-statistics(1) completion                          -*- shell-script -*-
+
+_gnunet_statistics()
+{
+    local cur prev words cword split
+    _init_completion -s || return
+
+    case $prev in
+        -c|--config|-l|--logfile)
+            _filedir
+            return
+            ;;
+        -L|--log)
+            COMPREPLY=( $( compgen -W 'DEBUG INFO WARNING ERROR' -- "$cur" ) )
+            return
+            ;;
+        -s|--subsystem)
+            COMPREPLY=( $( compgen -W "$( "$1" 2>/dev/null | \
+                sed 's|^[ \!]\([^ ]\{1,\}\).*$|\1|' )" -- "$cur" ) )
+            return
+            ;;
+        -n|--name)
+            # argument required but no completions available
+            return
+            ;;
+    esac
+
+    $split && return
+
+    if [[ "$cur" == -* ]]; then
+        COMPREPLY=( $( compgen -W '$( _parse_help "$1" --help )' -- "$cur" ) )
+        [[ $COMPREPLY == *= ]] && compopt -o nospace
+        return
+    fi
+} &&
+complete -F _gnunet_statistics gnunet-statistics
+
+# ex: ts=4 sw=4 et filetype=sh

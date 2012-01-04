@@ -1,0 +1,39 @@
+# gnunet-arm(1) completion                                 -*- shell-script -*-
+
+_gnunet_arm()
+{
+    local cur prev words cword split
+    _init_completion -s || return
+
+    case $prev in
+        -c|--config|-l|--logfile)
+            _filedir
+            return
+            ;;
+        -L|--log)
+            COMPREPLY=( $( compgen -W 'DEBUG INFO WARNING ERROR' -- "$cur" ) )
+            return
+            ;;
+        -T|--timeout)
+            # expect integer value
+            COMPREPLY+=( $( compgen -W '{0..9}' ) )
+            compopt -o nospace
+            return
+            ;;
+        -i|--init|-k|--kill)
+            # argument required but no completions available
+            return
+            ;;
+    esac
+
+    $split && return
+
+    if [[ "$cur" == -* ]]; then
+        COMPREPLY=( $( compgen -W '$( _parse_help "$1" --help )' -- "$cur" ) )
+        [[ $COMPREPLY == *= ]] && compopt -o nospace
+        return
+    fi
+} &&
+complete -F _gnunet_arm gnunet-arm
+
+# ex: ts=4 sw=4 et filetype=sh

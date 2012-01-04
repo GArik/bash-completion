@@ -101,6 +101,11 @@ bashcomp_DATA = a2x \
 		gkrellm \
 		gnatmake \
 		gnome-mplayer \
+		gnunet-arm \
+		gnunet-download \
+		gnunet-peerinfo \
+		gnunet-search \
+		gnunet-statistics \
 		gpasswd \
 		gpg \
 		gpg2 \
