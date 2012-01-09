@@ -1,0 +1,21 @@
+proc setup {} {
+    save_env
+}
+
+
+proc teardown {} {
+    assert_env_unmodified
+}
+
+
+setup
+
+
+set test "--creat<TAB> should complete \"--create\""
+assert_complete "--create=" "gnunet-pseudonym --creat" $test -nospace
+
+
+sync_after_int
+
+
+teardown

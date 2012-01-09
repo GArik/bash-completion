@@ -103,7 +103,10 @@ bashcomp_DATA = a2x \
 		gnome-mplayer \
 		gnunet-arm \
 		gnunet-download \
+		gnunet-fs \
 		gnunet-peerinfo \
+		gnunet-pseudonym \
+		gnunet-publish \
 		gnunet-search \
 		gnunet-statistics \
 		gpasswd \

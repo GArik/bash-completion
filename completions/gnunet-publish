@@ -1,0 +1,50 @@
+# gnunet-publish(1) completion                             -*- shell-script -*-
+
+_gnunet_publish()
+{
+    local cur prev words cword split
+    _init_completion -s || return
+
+    case $prev in
+        -c|--config|-l|--logfile)
+            _filedir
+            return
+            ;;
+        -L|--log)
+            COMPREPLY=( $( compgen -W 'DEBUG INFO WARNING ERROR' -- "$cur" ) )
+            return
+            ;;
+        -a|--anonymity)
+            COMPREPLY=( $( compgen -W '{0..9}' -- "$cur" ) )
+            return
+            ;;
+        -P|--pseudonym)
+            COMPREPLY=( $( compgen -W $( gnunet-pseudonym -o 2>/dev/null | \
+                cut -f1 -d\  ) -- "$cur" ) )
+            return
+            ;;
+        -p|--priority|-r|--replication)
+            # expect integer value
+            COMPREPLY+=( $( compgen -W '{0..9}' ) )
+            compopt -o nospace
+            return
+            ;;
+        -k|--key|-m|--meta|-N|--next|-t|--this|-u|--uri)
+            # argument required but no completions available
+            return
+            ;;
+    esac
+
+    $split && return
+
+    if [[ "$cur" == -* ]]; then
+        COMPREPLY=( $( compgen -W '$( _parse_help "$1" --help )' -- "$cur" ) )
+        [[ $COMPREPLY == *= ]] && compopt -o nospace
+        return
+    fi
+
+    _filedir
+} &&
+complete -F _gnunet_publish gnunet-publish
+
+# ex: ts=4 sw=4 et filetype=sh

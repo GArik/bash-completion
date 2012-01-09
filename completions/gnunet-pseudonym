@@ -1,0 +1,64 @@
+# gnunet-pseudonym(1) completion                           -*- shell-script -*-
+
+_gnunet_pseudonym()
+{
+    local cur prev words cword split
+    _init_completion -s -n : || return
+
+    case $prev in
+        -c|--config|-l|--logfile)
+            _filedir
+            return
+            ;;
+        -L|--log)
+            COMPREPLY=( $( compgen -W 'DEBUG INFO WARNING ERROR' -- "$cur" ) )
+            return
+            ;;
+        -a|--anonymity)
+            COMPREPLY=( $( compgen -W '{0..9}' -- "$cur" ) )
+            return
+            ;;
+        -p|--priority|-r|--replication)
+            # expect integer value
+            COMPREPLY+=( $( compgen -W '{0..9}' ) )
+            compopt -o nospace
+            return
+            ;;
+        -D|--delete)
+            COMPREPLY=( $( compgen -W $( gnunet-pseudonym -o 2>/dev/null | \
+                cut -f1 -d\  ) -- "$cur" ) )
+            return
+            ;;
+        -s|--set-rating)
+            if [[ $cur == *:* ]]; then
+                # expect integer value
+                COMPREPLY+=( $( compgen -W '{0..9}' ) )
+                compopt -o nospace
+            else
+                COMPREPLY=( $( compgen -S : -W $( gnunet-pseudonym -o \
+                    2>/dev/null | cut -f1 -d\  ) -- "$cur" ) )
+                compopt -o nospace
+            fi
+            return
+            ;;
+        -R|--root)
+            # FIXME: ? IDENTIFIER ?
+            return
+            ;;
+        -C|--create|-k|--keyword|-m|--meta)
+            # argument required but no completions available
+            return
+            ;;
+    esac
+
+    $split && return
+
+    if [[ "$cur" == -* ]]; then
+        COMPREPLY=( $( compgen -W '$( _parse_help "$1" --help )' -- "$cur" ) )
+        [[ $COMPREPLY == *= ]] && compopt -o nospace
+        return
+    fi
+} &&
+complete -F _gnunet_pseudonym gnunet-pseudonym
+
+# ex: ts=4 sw=4 et filetype=sh
