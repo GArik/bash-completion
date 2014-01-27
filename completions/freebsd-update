@@ -21,7 +21,8 @@ _freebsd-update()
             ;;
     esac
 
-    COMPREPLY=( $(compgen -W "fetch cron upgrade install rollback IDS" -- $cur) )
+    COMPREPLY=( $(compgen -W "fetch cron upgrade install rollback IDS" -- \
+        $cur) )
 } &&
 complete -F _freebsd-update  freebsd-update
 
