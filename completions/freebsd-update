@@ -16,6 +16,9 @@ _freebsd-update()
             _filedir
             return
             ;;
+        -k|-r|-s|-t)
+            return
+            ;;
     esac
 
     COMPREPLY=( $(compgen -W "fetch cron upgrade install rollback IDS" -- $cur) )
