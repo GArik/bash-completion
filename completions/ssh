@@ -112,6 +112,45 @@ _ssh_suboption_check()
     return 1
 }
 
+_refresh_ec2_hosts_cache()
+{
+    local hosts
+    local cache_file="${1}"
+
+    hosts=`aws ec2 describe-instances | grep 'TAGS\tName' | awk '{print $3}'`
+
+    if [ -n "${hosts}" ]; then
+        echo ${hosts} > "${cache_file}"
+    fi
+}
+
+_ec2_hosts()
+{
+    # Cache ec2 host names for 1 minute for speed
+    local cache_file="${HOME}/.ec2_node_names"
+
+    # Refresh the cache if:
+    # - There is no cache
+    # - It doesn't contain the search string
+    # - It's more than 5 minutes old
+    if [ ! -f "${cache_file}" ] || \
+        ! grep -q ${1} "${cache_file}" || \
+        test `find "${cache_file}" -mmin +1440`; then
+        aws ec2 describe-instances | \
+            grep 'TAGS\tName' | \
+            awk '{print $3}' > "${cache_file}"
+    fi
+
+    COMPREPLY+=( $( compgen -W \
+        "$(cat "${cache_file}")" -- "${1}" ) )
+
+    # Refresh the cache in the background every time (Run in a subshell to
+    # suppress PID output)
+    (_refresh_ec2_hosts_cache "${cache_file}" &)
+
+    return 0
+}
+
 _ssh()
 {
     local cur prev words cword
@@ -184,6 +223,9 @@ _ssh()
             shift
         done
         _known_hosts_real -a -F "$configfile" "$cur"
+        if [ ${AWS_ACCESS_KEY} ] && [ ${AWS_SECRET_KEY} ] && [ $(which aws) ]; then
+            _ec2_hosts "$cur"
+        fi
         if [[ $cword -ne 1 ]]; then
             compopt -o filenames
             COMPREPLY+=( $( compgen -c -- "$cur" ) )
